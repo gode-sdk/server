@@ -1,9 +1,12 @@
+
 import psycopg2
 from dotenv import load_dotenv
 import os
 import time
 
+
 load_dotenv()
+
 
 # Database connection parameters
 DB_CONFIG = {
@@ -14,6 +17,7 @@ DB_CONFIG = {
     "port": os.getenv("DB_PORT")
 }
 
+
 def connect():
     """Establishes a database connection."""
     try:
@@ -23,6 +27,7 @@ def connect():
     except Exception as e:
         print(f"Error connecting to database: {e}")
         return None, None
+
 
 def create_table():
     """Creates a users table if it doesn't exist."""
@@ -44,6 +49,7 @@ def create_table():
     cursor.close()
     conn.close()
     print("Table created successfully.")
+
 
 def insert_user(name, email, age):
     """Inserts a user into the database."""
@@ -67,6 +73,7 @@ def insert_user(name, email, age):
         cursor.close()
         conn.close()
 
+
 def get_users():
     """Fetches all users from the database."""
     conn, cursor = connect()
@@ -82,6 +89,7 @@ def get_users():
 
     cursor.close()
     conn.close()
+
 
 if __name__ == "__main__":
     # Wait for PostgreSQL to be ready
