@@ -35,4 +35,4 @@ jobs:
 
       - name: Auto-format code with black
         run: |
-          black .  # Automatically formats the code
+          black .

@@ -1,4 +1,3 @@
-
 import psycopg2
 from dotenv import load_dotenv
 import os
@@ -7,8 +6,6 @@ import time
 
 load_dotenv()
 
-
-# Database connection parameters
 DB_CONFIG = {
     "dbname": os.getenv("DB_NAME"),
     "user": os.getenv("DB_USER"),
@@ -90,8 +87,7 @@ def get_users():
 
 
 if __name__ == "__main__":
-    # Wait for PostgreSQL to be ready
-    time.sleep(10)  # Adjust depending on your system
+    time.sleep(10)
 
     create_table()
     insert_user("John Doe", "john@example.com", 30)
