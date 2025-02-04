@@ -34,7 +34,6 @@ def create_table():
     conn, cursor = connect()
     if not conn:
         return
-    
     query = """
     CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -83,7 +82,6 @@ def get_users():
     query = "SELECT * FROM users;"
     cursor.execute(query)
     users = cursor.fetchall()
-    
     for user in users:
         print(user)
 
