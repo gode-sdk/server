@@ -6,6 +6,7 @@ import psycopg2
 import uvicorn
 from dotenv import load_dotenv
 from pathlib import Path
+import subprocess
 
 load_dotenv()
 

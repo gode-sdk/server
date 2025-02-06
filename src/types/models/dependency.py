@@ -106,7 +106,6 @@ async def get_for_mod_versions(
         logging.error(f"Error fetching dependencies: {e}")
         raise ApiError("DbError")
 
-# Add necessary exceptions or classes like ApiError
 class ApiError(Exception):
     def __init__(self, message: str):
         self.message = message

@@ -91,7 +91,7 @@ INSERT INTO mod_tags (name, display_name, is_readonly) VALUES
   ('paid', 'Paid', false),
   ('joke', 'Joke', false),
   ('modtober24', 'Modtober 2024', false),
-  ('modtober24winner', 'Modtober 2024 Winner', true)
+  ('modtober24winner', 'Modtober 2024 Winner', true),
   ('api', 'API', false)
 ON CONFLICT (name) 
 DO UPDATE SET display_name = EXCLUDED.display_name;
