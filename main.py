@@ -2,7 +2,7 @@ import psycopg2
 from dotenv import load_dotenv
 import os
 import time
-import src.discordWebhook
+import src.webhook.discord
 
 load_dotenv()
 

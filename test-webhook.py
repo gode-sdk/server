@@ -1,7 +1,7 @@
 import os
 import time
 import requests
-from src.discordWebhook import NewModAcceptedEvent, NewModVersionAcceptedEvent
+from src.webhook.discord import NewModAcceptedEvent, NewModVersionAcceptedEvent
 from dotenv import load_dotenv
 
 load_dotenv()

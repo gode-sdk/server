@@ -1,1 +1,1 @@
-from src.discordWebhook import NewModAcceptedEvent, NewModVersionAcceptedEvent, DiscordMessage
+from src.webhook.discord import NewModAcceptedEvent, NewModVersionAcceptedEvent, DiscordMessage
