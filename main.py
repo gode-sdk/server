@@ -1,10 +1,16 @@
-import psycopg2
-from dotenv import load_dotenv
+import logging
 import os
-import time
-import src.webhook.discord
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+import psycopg2
+import uvicorn
+from dotenv import load_dotenv
+from pathlib import Path
 
 load_dotenv()
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 DB_CONFIG = {
     "dbname": os.getenv("DB_NAME"),
@@ -14,81 +20,70 @@ DB_CONFIG = {
     "port": os.getenv("DB_PORT")
 }
 
-
-def connect():
-    """Establishes a database connection."""
+def connect_db():
     try:
         conn = psycopg2.connect(**DB_CONFIG)
         cursor = conn.cursor()
+        logger.info("Database connection established")
         return conn, cursor
     except Exception as e:
-        print(f"Error connecting to database: {e}")
+        logger.error(f"Error connecting to database: {e}")
         return None, None
 
+async def lifespan(app: FastAPI):
+    await startup()
+    yield
+    await shutdown()
 
-def create_table():
-    """Creates a users table if it doesn't exist."""
-    conn, cursor = connect()
+async def startup():
+    logger.info("Application startup")
+    await run_migrations()
+
+    conn, cursor = connect_db()
     if not conn:
-        return
-    query = """
-    CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        email VARCHAR(100) UNIQUE NOT NULL,
-        age INT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    """
-    cursor.execute(query)
-    conn.commit()
-    cursor.close()
-    conn.close()
-    print("Table created successfully.")
-
-
-def insert_user(name, email, age):
-    """Inserts a user into the database."""
-    conn, cursor = connect()
-    if not conn:
+        logger.error("Database connection failed, exiting.")
         return
 
-    query = """
-    INSERT INTO users (name, email, age) VALUES (%s, %s, %s)
-    RETURNING id;
-    """
-    try:
-        cursor.execute(query, (name, email, age))
-        user_id = cursor.fetchone()[0]
-        conn.commit()
-        print(f"User inserted with ID: {user_id}")
-    except Exception as e:
-        print(f"Error inserting user: {e}")
-        conn.rollback()
-    finally:
-        cursor.close()
-        conn.close()
+    port = int(os.getenv("PORT", 8000))
+    debug = bool(os.getenv("DEBUG", False))
 
+    logger.info(f"Starting server on 0.0.0.0:{port}")
+    if debug:
+        logger.info("Running in debug mode, using 1 thread.")
 
-def get_users():
-    """Fetches all users from the database."""
-    conn, cursor = connect()
-    if not conn:
+async def shutdown():
+    logger.info("Shutting down application")
+
+async def run_migrations():
+    logger.info("Running migrations...")
+    migration_files_path = Path("migrations")
+    if not migration_files_path.exists():
+        logger.error("Migrations folder not found, skipping migrations.")
         return
 
-    query = "SELECT * FROM users;"
-    cursor.execute(query)
-    users = cursor.fetchall()
-    for user in users:
-        print(user)
+    conn, cursor = connect_db()
+    if conn:
+        for migration_file in migration_files_path.iterdir():
+            if migration_file.suffix == ".sql":
+                with open(migration_file, "r") as file:
+                    cursor.execute(file.read())
+                    conn.commit()
 
-    cursor.close()
-    conn.close()
+app = FastAPI(lifespan=lifespan)
 
+origins = ["*"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"],
+    allow_headers=["*"],
+    max_age=3600,
+)
+
+@app.get("/")
+async def read_root():
+    return {"message": "Welcome to the server!"}
 
 if __name__ == "__main__":
-    time.sleep(10)
-
-    create_table()
-    insert_user("John Doe", "john@example.com", 30)
-    get_users()
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))

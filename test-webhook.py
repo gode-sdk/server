@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-webhook_url = os.getenv("DC_WEBHOOK_URL")
+webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
 
 # Example for NewModAcceptedEvent
 mod_event = NewModAcceptedEvent(

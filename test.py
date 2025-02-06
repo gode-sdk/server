@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Load GitHub OAuth credentials from .env file or environment variables
-GH_CLIENT_ID = os.getenv("GH_CLIENT_ID")
-GH_CLIENT_SECRET = os.getenv("GH_CLIENT_SECRET")
+GH_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
+GH_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
 
 # Step 1: Request device and user verification codes
 device_code_url = "https://github.com/login/device/code"
